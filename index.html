@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Русские Глаголы — Gebiedende Wijs Oefenen</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Sans+Pro:wght@300;400;600;700&family=Noto+Sans:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --bg2: #16213e;
+    --card: #0f3460;
+    --accent: #e94560;
+    --accent2: #f5a623;
+    --green: #4ecdc4;
+    --text: #eef0f2;
+    --textdim: #8892a4;
+    --correct: #4ecdc4;
+    --wrong: #e94560;
+    --gold: #f5a623;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Source Sans Pro', 'Noto Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: radial-gradient(ellipse at 20% 50%, rgba(233,69,96,0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(78,205,196,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(245,166,35,0.05) 0%, transparent 50%);
+    animation: drift 20s ease-in-out infinite alternate;
+    z-index: 0;
+  }
+
+  @keyframes drift {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(-3%, 2%) rotate(3deg); }
+  }
+
+  .app {
+    position: relative;
+    z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.4rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    background: linear-gradient(135deg, var(--accent), var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 0.3rem;
+  }
+
+  header .subtitle {
+    font-size: 1rem;
+    color: var(--textdim);
+    font-weight: 300;
+    letter-spacing: 0.08em;
+  }
+
+  .score-bar {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+    color: var(--textdim);
+  }
+  .score-bar span { display: flex; align-items: center; gap: 0.4rem; }
+  .score-bar .num { font-weight: 700; font-size: 1.2rem; }
+  .score-bar .num.correct-num { color: var(--correct); }
+  .score-bar .num.wrong-num { color: var(--wrong); }
+  .score-bar .num.streak-num { color: var(--gold); }
+
+  .tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .tab {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--textdim);
+    padding: 0.45rem 1rem;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: inherit;
+  }
+  .tab:hover { border-color: var(--accent); color: var(--text); }
+  .tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  .card {
+    background: linear-gradient(145deg, var(--bg2), var(--card));
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 2rem 2rem 1.5rem;
+    margin-bottom: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+    animation: cardIn 0.35s ease-out;
+  }
+
+  @keyframes cardIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .verb-type {
+    display: inline-block;
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--gold);
+    background: rgba(245,166,35,0.12);
+    padding: 0.2rem 0.7rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    font-weight: 600;
+  }
+
+  .infinitive {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.3rem;
+  }
+
+  .meaning {
+    color: var(--textdim);
+    font-size: 0.95rem;
+    font-style: italic;
+    margin-bottom: 0.15rem;
+  }
+
+  .aspect-info {
+    font-size: 0.82rem;
+    color: var(--textdim);
+    margin-bottom: 1.5rem;
+    opacity: 0.7;
+  }
+
+  .prompt-label {
+    font-size: 0.85rem;
+    color: var(--textdim);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .prompt-form {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .input-wrap {
+    flex: 1;
+    position: relative;
+  }
+
+  input[type="text"] {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    color: var(--text);
+    font-size: 1.3rem;
+    padding: 0.65rem 1rem;
+    font-family: 'Noto Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.25s;
+  }
+  input[type="text"]:focus { border-color: var(--accent); }
+  input[type="text"].correct { border-color: var(--correct); background: rgba(78,205,196,0.08); }
+  input[type="text"].wrong { border-color: var(--wrong); background: rgba(233,69,96,0.08); }
+
+  .btn-row {
+    display: flex;
+    gap: 0.6rem;
+    margin-top: 1rem;
+  }
+
+  button.primary {
+    flex: 1;
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    padding: 0.7rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  button.primary:hover { filter: brightness(1.15); transform: translateY(-1px); }
+
+  button.secondary {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: var(--textdim);
+    border-radius: 10px;
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+  button.secondary:hover { border-color: var(--text); color: var(--text); }
+
+  .feedback {
+    margin-top: 1rem;
+    font-size: 1rem;
+    min-height: 1.6rem;
+    transition: all 0.3s;
+  }
+  .feedback.correct-fb { color: var(--correct); }
+  .feedback.wrong-fb { color: var(--wrong); }
+
+  .answer-reveal {
+    margin-top: 0.7rem;
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    border-left: 3px solid var(--gold);
+    animation: cardIn 0.3s ease-out;
+  }
+  .answer-reveal .label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+  }
+  .answer-reveal .forms {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.3rem 1.5rem;
+    font-size: 0.95rem;
+  }
+  .answer-reveal .forms .key { color: var(--textdim); }
+  .answer-reveal .forms .val { font-weight: 600; }
+
+  .note {
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+    color: var(--textdim);
+    font-style: italic;
+    line-height: 1.5;
+  }
+
+  .ref-toggle {
+    text-align: center;
+    margin-top: 2rem;
+  }
+  .ref-toggle button {
+    background: none;
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--textdim);
+    padding: 0.5rem 1.2rem;
+    border-radius: 99px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.25s;
+  }
+  .ref-toggle button:hover { border-color: var(--accent); color: var(--text); }
+
+  .ref-table {
+    display: none;
+    margin-top: 1.5rem;
+    overflow-x: auto;
+  }
+  .ref-table.open { display: block; }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+  }
+  th {
+    text-align: left;
+    padding: 0.5rem 0.6rem;
+    font-weight: 600;
+    color: var(--gold);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  td {
+    padding: 0.45rem 0.6rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    color: var(--text);
+  }
+  tr:hover td { background: rgba(255,255,255,0.03); }
+
+  .cat-label {
+    font-size: 0.7rem;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+  }
+
+  @media (max-width: 520px) {
+    header h1 { font-size: 1.8rem; }
+    .infinitive { font-size: 1.6rem; }
+    .card { padding: 1.4rem; }
+    .answer-reveal .forms { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>Повелительное наклонение</h1>
+    <div class="subtitle">Russische gebiedende wijs — Oefentool</div>
+  </header>
+
+  <div class="score-bar">
+    <span>✓ <span class="num correct-num" id="correctCount">0</span></span>
+    <span>✗ <span class="num wrong-num" id="wrongCount">0</span></span>
+    <span>🔥 <span class="num streak-num" id="streakCount">0</span></span>
+  </div>
+
+  <div class="tabs" id="tabs"></div>
+
+  <div class="card" id="card">
+    <div class="verb-type" id="verbType"></div>
+    <div class="infinitive" id="infinitive"></div>
+    <div class="meaning" id="meaning"></div>
+    <div class="aspect-info" id="aspectInfo"></div>
+
+    <div class="prompt-label" id="promptLabel"></div>
+    <div class="prompt-form">
+      <input type="text" id="answer" autocomplete="off" spellcheck="false" placeholder="typ hier…">
+    </div>
+    <div class="btn-row">
+      <button class="primary" id="checkBtn" onclick="check()">Controleren</button>
+      <button class="secondary" onclick="showAnswer()">Tonen</button>
+      <button class="secondary" onclick="nextQuestion()">Volgende →</button>
+    </div>
+    <div class="feedback" id="feedback"></div>
+    <div id="revealArea"></div>
+  </div>
+
+  <div class="ref-toggle">
+    <button onclick="toggleRef()">📖 Overzichtstabel</button>
+  </div>
+  <div class="ref-table" id="refTable"></div>
+</div>
+
+<script>
+const verbs = [
+  // === BEWEGINGSWERKWOORDEN ===
+
+  // ходить — идти — пойти (te voet gaan)
+  { inf: "ходи́ть", meaning: "lopen, gaan (meervoudige richting)", cat: "motion-nondir",
+    aspect: "ОНВ, niet-gericht", stem_note: "ходи- → -и",
+    imp_ty: "ходи́", imp_vy: "ходи́те",
+    pair: "идти́ / пойти́" },
+  { inf: "идти́", meaning: "lopen, gaan (één richting)", cat: "motion-dir-impf",
+    aspect: "ОНВ, gericht", stem_note: "иди- → -и",
+    imp_ty: "иди́", imp_vy: "иди́те",
+    pair: "ходи́ть / пойти́" },
+  { inf: "пойти́", meaning: "gaan, vertrekken (voltooid)", cat: "motion-dir-pf",
+    aspect: "ВВ", stem_note: "пойди- → -и (onregelmatig)",
+    imp_ty: "пойди́", imp_vy: "пойди́те",
+    pair: "ходи́ть / идти́" },
+
+  // ездить — ехать — поехать (rijden)
+  { inf: "е́здить", meaning: "rijden (meervoudige richting)", cat: "motion-nondir",
+    aspect: "ОНВ, niet-gericht", stem_note: "езди- → -и",
+    imp_ty: "е́зди", imp_vy: "е́здите",
+    pair: "е́хать / пое́хать" },
+  { inf: "е́хать", meaning: "rijden (één richting)", cat: "motion-dir-impf",
+    aspect: "ОНВ, gericht", stem_note: "поезжай- (suppletief!)",
+    imp_ty: "поезжа́й", imp_vy: "поезжа́йте",
+    pair: "е́здить / пое́хать" },
+  { inf: "пое́хать", meaning: "vertrekken, gaan rijden (voltooid)", cat: "motion-dir-pf",
+    aspect: "ВВ", stem_note: "поезжай- (suppletief!)",
+    imp_ty: "поезжа́й", imp_vy: "поезжа́йте",
+    pair: "е́здить / е́хать" },
+
+  // бегать — бежать — побежать (rennen)
+  { inf: "бе́гать", meaning: "rennen, hardlopen (meervoudige richting)", cat: "motion-nondir",
+    aspect: "ОНВ, niet-gericht", stem_note: "бегай- → -й",
+    imp_ty: "бе́гай", imp_vy: "бе́гайте",
+    pair: "бежа́ть / побежа́ть" },
+  { inf: "бежа́ть", meaning: "rennen (één richting)", cat: "motion-dir-impf",
+    aspect: "ОНВ, gericht", stem_note: "беги- → -и",
+    imp_ty: "беги́", imp_vy: "беги́те",
+    pair: "бе́гать / побежа́ть" },
+  { inf: "побежа́ть", meaning: "beginnen te rennen (voltooid)", cat: "motion-dir-pf",
+    aspect: "ВВ", stem_note: "побеги- → -и",
+    imp_ty: "побеги́", imp_vy: "побеги́те",
+    pair: "бе́гать / бежа́ть" },
+
+  // летать — лететь — полететь (vliegen)
+  { inf: "лета́ть", meaning: "vliegen (meervoudige richting)", cat: "motion-nondir",
+    aspect: "ОНВ, niet-gericht", stem_note: "летай- → -й",
+    imp_ty: "лета́й", imp_vy: "лета́йте",
+    pair: "лете́ть / полете́ть" },
+  { inf: "лете́ть", meaning: "vliegen (één richting)", cat: "motion-dir-impf",
+    aspect: "ОНВ, gericht", stem_note: "лети- → -и",
+    imp_ty: "лети́", imp_vy: "лети́те",
+    pair: "лета́ть / полете́ть" },
+  { inf: "полете́ть", meaning: "wegvliegen, opstijgen (voltooid)", cat: "motion-dir-pf",
+    aspect: "ВВ", stem_note: "полети- → -и",
+    imp_ty: "полети́", imp_vy: "полети́те",
+    pair: "лета́ть / лете́ть" },
+
+  // плавать — плыть (zwemmen)
+  { inf: "пла́вать", meaning: "zwemmen (meervoudige richting)", cat: "motion-nondir",
+    aspect: "ОНВ, niet-gericht", stem_note: "плавай- → -й",
+    imp_ty: "пла́вай", imp_vy: "пла́вайте",
+    pair: "плыть / поплы́ть" },
+  { inf: "плыть", meaning: "zwemmen (één richting)", cat: "motion-dir-impf",
+    aspect: "ОНВ, gericht", stem_note: "плыви- → -и",
+    imp_ty: "плыви́", imp_vy: "плыви́те",
+    pair: "пла́вать / поплы́ть" },
+
+  // носить — нести (dragen)
+  { inf: "носи́ть", meaning: "dragen (meervoudige richting)", cat: "motion-nondir",
+    aspect: "ОНВ, niet-gericht", stem_note: "носи- → -и",
+    imp_ty: "носи́", imp_vy: "носи́те",
+    pair: "нести́ / понести́" },
+  { inf: "нести́", meaning: "dragen (één richting)", cat: "motion-dir-impf",
+    aspect: "ОНВ, gericht", stem_note: "неси- → -и",
+    imp_ty: "неси́", imp_vy: "неси́те",
+    pair: "носи́ть / понести́" },
+
+  // водить — вести (leiden, besturen)
+  { inf: "води́ть", meaning: "leiden, besturen (meervoudige richting)", cat: "motion-nondir",
+    aspect: "ОНВ, niet-gericht", stem_note: "води- → -и",
+    imp_ty: "води́", imp_vy: "води́те",
+    pair: "вести́ / повести́" },
+  { inf: "вести́", meaning: "leiden (één richting)", cat: "motion-dir-impf",
+    aspect: "ОНВ, gericht", stem_note: "веди- → -и",
+    imp_ty: "веди́", imp_vy: "веди́те",
+    pair: "води́ть / повести́" },
+
+  // возить — везти (vervoeren)
+  { inf: "вози́ть", meaning: "vervoeren (meervoudige richting)", cat: "motion-nondir",
+    aspect: "ОНВ, niet-gericht", stem_note: "вози- → -и",
+    imp_ty: "вози́", imp_vy: "вози́те",
+    pair: "везти́ / повезти́" },
+  { inf: "везти́", meaning: "vervoeren (één richting)", cat: "motion-dir-impf",
+    aspect: "ОНВ, gericht", stem_note: "вези- → -и",
+    imp_ty: "вези́", imp_vy: "вези́те",
+    pair: "вози́ть / повезти́" },
+
+  // лазить — лезть (klimmen)
+  { inf: "ла́зить", meaning: "klimmen, kruipen (meervoudige richting)", cat: "motion-nondir",
+    aspect: "ОНВ, niet-gericht", stem_note: "лазь- → -ь",
+    imp_ty: "ла́зь", imp_vy: "ла́зьте",
+    pair: "лезть / поле́зть" },
+  { inf: "лезть", meaning: "klimmen, kruipen (één richting)", cat: "motion-dir-impf",
+    aspect: "ОНВ, gericht", stem_note: "лезь- → -ь",
+    imp_ty: "лезь", imp_vy: "ле́зьте",
+    pair: "ла́зить / поле́зть" },
+
+  // === VEELGEBRUIKTE WERKWOORDEN ===
+
+  { inf: "чита́ть", meaning: "lezen (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "читай- → -й",
+    imp_ty: "чита́й", imp_vy: "чита́йте", pair: "прочита́ть" },
+  { inf: "прочита́ть", meaning: "lezen (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "прочитай- → -й",
+    imp_ty: "прочита́й", imp_vy: "прочита́йте", pair: "чита́ть" },
+
+  { inf: "писа́ть", meaning: "schrijven (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "пиши- → -и (medeklinkerwissel с→ш)",
+    imp_ty: "пиши́", imp_vy: "пиши́те", pair: "написа́ть" },
+  { inf: "написа́ть", meaning: "schrijven (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "напиши- → -и",
+    imp_ty: "напиши́", imp_vy: "напиши́те", pair: "писа́ть" },
+
+  { inf: "говори́ть", meaning: "spreken (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "говори- → -и",
+    imp_ty: "говори́", imp_vy: "говори́те", pair: "сказа́ть" },
+  { inf: "сказа́ть", meaning: "zeggen, vertellen (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "скажи- → -и (wissel з→ж)",
+    imp_ty: "скажи́", imp_vy: "скажи́те", pair: "говори́ть" },
+
+  { inf: "де́лать", meaning: "doen, maken (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "делай- → -й",
+    imp_ty: "де́лай", imp_vy: "де́лайте", pair: "сде́лать" },
+  { inf: "сде́лать", meaning: "doen, maken (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "сделай- → -й",
+    imp_ty: "сде́лай", imp_vy: "сде́лайте", pair: "де́лать" },
+
+  { inf: "смотре́ть", meaning: "kijken (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "смотри- → -и",
+    imp_ty: "смотри́", imp_vy: "смотри́те", pair: "посмотре́ть" },
+  { inf: "посмотре́ть", meaning: "kijken, bekijken (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "посмотри- → -и",
+    imp_ty: "посмотри́", imp_vy: "посмотри́те", pair: "смотре́ть" },
+
+  { inf: "слу́шать", meaning: "luisteren (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "слушай- → -й",
+    imp_ty: "слу́шай", imp_vy: "слу́шайте", pair: "послу́шать" },
+  { inf: "послу́шать", meaning: "luisteren (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "послушай- → -й",
+    imp_ty: "послу́шай", imp_vy: "послу́шайте", pair: "слу́шать" },
+
+  { inf: "дать", meaning: "geven (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "дай- (onregelmatig)",
+    imp_ty: "дай", imp_vy: "да́йте", pair: "дава́ть" },
+  { inf: "дава́ть", meaning: "geven (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "давай- → -й",
+    imp_ty: "дава́й", imp_vy: "дава́йте", pair: "дать" },
+
+  { inf: "есть", meaning: "eten (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "ешь- (onregelmatig)",
+    imp_ty: "ешь", imp_vy: "е́шьте", pair: "съесть" },
+  { inf: "съесть", meaning: "opeten (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "съешь- (onregelmatig)",
+    imp_ty: "съешь", imp_vy: "съе́шьте", pair: "есть" },
+
+  { inf: "пить", meaning: "drinken (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "пей- → -й",
+    imp_ty: "пей", imp_vy: "пе́йте", pair: "вы́пить" },
+  { inf: "вы́пить", meaning: "opdrinken (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "выпей- → -й",
+    imp_ty: "вы́пей", imp_vy: "вы́пейте", pair: "пить" },
+
+  { inf: "встать", meaning: "opstaan (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "встань- → -ь",
+    imp_ty: "встань", imp_vy: "вста́ньте", pair: "встава́ть" },
+  { inf: "встава́ть", meaning: "opstaan (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "вставай- → -й",
+    imp_ty: "встава́й", imp_vy: "встава́йте", pair: "встать" },
+
+  { inf: "сесть", meaning: "gaan zitten (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "сядь- (onregelmatig)",
+    imp_ty: "сядь", imp_vy: "ся́дьте", pair: "сади́ться" },
+  { inf: "сади́ться", meaning: "gaan zitten (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "садись- → -ись (reflexief)",
+    imp_ty: "сади́сь", imp_vy: "сади́тесь", pair: "сесть" },
+
+  { inf: "помо́чь", meaning: "helpen (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "помоги- → -и (wissel ч→г→ги)",
+    imp_ty: "помоги́", imp_vy: "помоги́те", pair: "помога́ть" },
+  { inf: "помога́ть", meaning: "helpen (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "помогай- → -й",
+    imp_ty: "помога́й", imp_vy: "помога́йте", pair: "помо́чь" },
+
+  { inf: "подожда́ть", meaning: "wachten (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "подожди- → -и",
+    imp_ty: "подожди́", imp_vy: "подожди́те", pair: "ждать" },
+  { inf: "ждать", meaning: "wachten (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "жди- → -и",
+    imp_ty: "жди", imp_vy: "жди́те", pair: "подожда́ть" },
+
+  { inf: "откры́ть", meaning: "openen (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "откро́й- → -й",
+    imp_ty: "откро́й", imp_vy: "откро́йте", pair: "открыва́ть" },
+  { inf: "открыва́ть", meaning: "openen (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "открывай- → -й",
+    imp_ty: "открыва́й", imp_vy: "открыва́йте", pair: "откры́ть" },
+
+  { inf: "закры́ть", meaning: "sluiten (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "закро́й- → -й",
+    imp_ty: "закро́й", imp_vy: "закро́йте", pair: "закрыва́ть" },
+  { inf: "закрыва́ть", meaning: "sluiten (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "закрывай- → -й",
+    imp_ty: "закрыва́й", imp_vy: "закрыва́йте", pair: "закры́ть" },
+
+  { inf: "положи́ть", meaning: "neerleggen (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "положи- → -и",
+    imp_ty: "положи́", imp_vy: "положи́те", pair: "класть" },
+  { inf: "класть", meaning: "leggen (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "клади- → -и",
+    imp_ty: "клади́", imp_vy: "клади́те", pair: "положи́ть" },
+
+  { inf: "взять", meaning: "nemen, pakken (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "возьми- → -и (suppletief)",
+    imp_ty: "возьми́", imp_vy: "возьми́те", pair: "брать" },
+  { inf: "брать", meaning: "nemen, pakken (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "бери- → -и",
+    imp_ty: "бери́", imp_vy: "бери́те", pair: "взять" },
+
+  { inf: "учи́ть", meaning: "leren, studeren (onvoltooid)", cat: "common",
+    aspect: "ОНВ", stem_note: "учи- → -и",
+    imp_ty: "учи́", imp_vy: "учи́те", pair: "вы́учить" },
+
+  { inf: "верну́ться", meaning: "terugkeren (voltooid)", cat: "common",
+    aspect: "ВВ", stem_note: "вернись- → -ись (reflexief)",
+    imp_ty: "верни́сь", imp_vy: "верни́тесь", pair: "возвраща́ться" },
+];
+
+const categories = [
+  { id: "all", label: "Alles" },
+  { id: "motion-nondir", label: "Niet-gericht" },
+  { id: "motion-dir-impf", label: "Gericht ОНВ" },
+  { id: "motion-dir-pf", label: "Gericht ВВ" },
+  { id: "common", label: "Algemeen" },
+];
+
+let currentCat = "all";
+let currentVerb = null;
+let currentForm = "ty";
+let correct = 0, wrong = 0, streak = 0;
+let answered = false;
+
+function init() {
+  const tabsEl = document.getElementById("tabs");
+  categories.forEach(c => {
+    const btn = document.createElement("button");
+    btn.className = "tab" + (c.id === currentCat ? " active" : "");
+    btn.textContent = c.label;
+    btn.onclick = () => switchCat(c.id);
+    tabsEl.appendChild(btn);
+  });
+  buildRefTable();
+  nextQuestion();
+  document.getElementById("answer").addEventListener("keydown", e => {
+    if (e.key === "Enter") {
+      if (answered) nextQuestion(); else check();
+    }
+  });
+}
+
+function switchCat(id) {
+  currentCat = id;
+  document.querySelectorAll(".tab").forEach((t, i) => {
+    t.classList.toggle("active", categories[i].id === id);
+  });
+  nextQuestion();
+}
+
+function getPool() {
+  if (currentCat === "all") return verbs;
+  return verbs.filter(v => v.cat === currentCat);
+}
+
+function nextQuestion() {
+  answered = false;
+  const pool = getPool();
+  let v;
+  do { v = pool[Math.floor(Math.random() * pool.length)]; } while (v === currentVerb && pool.length > 1);
+  currentVerb = v;
+  currentForm = Math.random() < 0.5 ? "ty" : "vy";
+
+  document.getElementById("verbType").textContent =
+    v.cat.startsWith("motion") ? "bewegingswerkwoord" : "algemeen werkwoord";
+  document.getElementById("infinitive").textContent = v.inf;
+  document.getElementById("meaning").textContent = v.meaning;
+  document.getElementById("aspectInfo").textContent = v.aspect + (v.pair ? " — paar: " + v.pair : "");
+
+  const formLabel = currentForm === "ty" ? "ты (enkelvoud, informeel)" : "вы (meervoud / formeel)";
+  document.getElementById("promptLabel").textContent = "Gebiedende wijs — " + formLabel;
+
+  const inp = document.getElementById("answer");
+  inp.value = "";
+  inp.className = "";
+  inp.focus();
+  document.getElementById("feedback").textContent = "";
+  document.getElementById("feedback").className = "feedback";
+  document.getElementById("revealArea").innerHTML = "";
+}
+
+function norm(s) {
+  return s.replace(/́/g, "").replace(/̀/g, "").toLowerCase().trim();
+}
+
+function check() {
+  if (answered) return;
+  const inp = document.getElementById("answer");
+  const val = inp.value.trim();
+  if (!val) return;
+
+  const expected = currentForm === "ty" ? currentVerb.imp_ty : currentVerb.imp_vy;
+  const isCorrect = norm(val) === norm(expected);
+
+  answered = true;
+  const fb = document.getElementById("feedback");
+
+  if (isCorrect) {
+    correct++;
+    streak++;
+    inp.className = "correct";
+    fb.textContent = "Juist! ✓";
+    fb.className = "feedback correct-fb";
+  } else {
+    wrong++;
+    streak = 0;
+    inp.className = "wrong";
+    fb.innerHTML = `Fout — juiste antwoord: <strong>${expected}</strong>`;
+    fb.className = "feedback wrong-fb";
+    showReveal();
+  }
+
+  document.getElementById("correctCount").textContent = correct;
+  document.getElementById("wrongCount").textContent = wrong;
+  document.getElementById("streakCount").textContent = streak;
+}
+
+function showAnswer() {
+  answered = true;
+  streak = 0;
+  document.getElementById("streakCount").textContent = streak;
+  const expected = currentForm === "ty" ? currentVerb.imp_ty : currentVerb.imp_vy;
+  const fb = document.getElementById("feedback");
+  fb.innerHTML = `Antwoord: <strong>${expected}</strong>`;
+  fb.className = "feedback";
+  showReveal();
+}
+
+function showReveal() {
+  const v = currentVerb;
+  document.getElementById("revealArea").innerHTML = `
+    <div class="answer-reveal">
+      <div class="label">Alle vormen</div>
+      <div class="forms">
+        <span class="key">ты:</span><span class="val">${v.imp_ty}</span>
+        <span class="key">вы:</span><span class="val">${v.imp_vy}</span>
+      </div>
+      <div class="note">${v.stem_note}</div>
+    </div>
+  `;
+}
+
+function buildRefTable() {
+  const el = document.getElementById("refTable");
+  let html = `<table><thead><tr><th>Type</th><th>Infinitief</th><th>Vertaling</th><th>ты</th><th>вы</th><th>Paar</th></tr></thead><tbody>`;
+  verbs.forEach(v => {
+    const catLabel = v.cat === "motion-nondir" ? "niet-ger." :
+                     v.cat === "motion-dir-impf" ? "ger. ОНВ" :
+                     v.cat === "motion-dir-pf" ? "ger. ВВ" : "";
+    html += `<tr>
+      <td><span class="cat-label">${catLabel}</span></td>
+      <td>${v.inf}</td>
+      <td style="color:var(--textdim);font-size:0.82rem">${v.meaning}</td>
+      <td>${v.imp_ty}</td>
+      <td>${v.imp_vy}</td>
+      <td style="color:var(--textdim);font-size:0.8rem">${v.pair || ""}</td>
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+  el.innerHTML = html;
+}
+
+function toggleRef() {
+  document.getElementById("refTable").classList.toggle("open");
+}
+
+init();
+</script>
+</body>
+</html>
